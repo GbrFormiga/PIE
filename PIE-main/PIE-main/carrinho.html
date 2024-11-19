@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/carrinhoStyle.css">
+  <title>Carrinho de Compras</title>
+</head>
+<body>
+  <div class="carrinho">
+    <h1>Carrinho</h1>
+
+    <div class="cart-items">
+      <!-- Itens do carrinho serão adicionados aqui dinamicamente -->
+    </div>
+
+    <div class="carrinho-comp">
+      <div class="total">
+        <p>Total:</p>
+        <p class="preco-total">R$ 0,00</p>
+      </div>
+      <button class="checkout-botao">Finalizar Compra</button>
+      <button class="cancel-botao">Cancelar</button>
+      <button class="voltar">VOLTAR</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cartItemsContainer = document.querySelector('.cart-items');
+      const totalPriceElement = document.querySelector('.preco-total');
+
+      const produtos = [
+        { nome: 'Playstation 5', preco: 3449.99, img: 'https://png.pngtree.com/png-vector/20240802/ourmid/pngtree-top-quality-play-station-console-isolated-on-transparent-background-png-image_13320220.png' },
+        { nome: 'Xbox Series S', preco: 2318.90, img: 'https://cms-assets.xboxservices.com/assets/bf/b0/bfb06f23-4c87-4c58-b4d9-ed25d3a739b9.png?n=389964_Hero-Gallery-0_A1_857x676.png' },
+        { nome: 'Nintendo Switch', preco: 2299.00, img: 'https://images.tcdn.com.br/img/img_prod/1211726/nintendo_switch_oled_azul_e_vermelho_neon_143_1_eb53e4bd0bea6264a7e5b404da257baa.png' }
+      ];
+
+      // Função para atualizar o total de preços
+      function updateTotalPrice() {
+        let total = 0;
+        const itemQuantities = document.querySelectorAll('.quantidade-input');
+        itemQuantities.forEach((input, index) => {
+          const quantity = parseInt(input.value);
+          total += produtos[index].preco * quantity;
+        });
+        totalPriceElement.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+      }
+
+      // Função para criar os itens no carrinho
+      function createCartItem(product, index) {
+        const cartItemDiv = document.createElement('div');
+        cartItemDiv.classList.add('cart-item');
+
+        cartItemDiv.innerHTML = `
+          <img src="${product.img}" alt="${product.nome}" class="item-image">
+          <div class="item-detalhes">
+            <p class="item-nome">${product.nome}</p>
+            <p class="item-preco">R$ ${product.preco.toFixed(2)}</p>
+          </div>
+          <div class="item-quantidade">
+            <button class="quantidade-botao">-</button>
+            <input type="number" value="1" class="quantidade-input" min="1">
+            <button class="quantidade-botao">+</button>
+          </div>
+        `;
+
+        // Manipulando os botões de quantidade
+        const decrementButton = cartItemDiv.querySelectorAll('.quantidade-botao')[0];
+        const incrementButton = cartItemDiv.querySelectorAll('.quantidade-botao')[1];
+        const quantityInput = cartItemDiv.querySelector('.quantidade-input');
+
+        // Decrementa a quantidade ou remove o item
+        decrementButton.addEventListener('click', () => {
+          let currentQuantity = parseInt(quantityInput.value);
+          if (currentQuantity > 1) {
+            quantityInput.value = currentQuantity - 1;
+          } else {
+            // Remover o item se a quantidade for 1
+            cartItemDiv.remove();
+          }
+          updateTotalPrice();
+        });
+
+        // Incrementa a quantidade
+        incrementButton.addEventListener('click', () => {
+          let currentQuantity = parseInt(quantityInput.value);
+          quantityInput.value = currentQuantity + 1;
+          updateTotalPrice();
+        });
+
+        cartItemsContainer.appendChild(cartItemDiv);
+      }
+
+      // Adiciona os produtos no carrinho ao carregar a página
+      produtos.forEach((produto, index) => {
+        createCartItem(produto, index);
+      });
+
+      // Inicializar o preço total ao carregar
+      updateTotalPrice();
+    });
+  </script>
+</body>
+</html>
